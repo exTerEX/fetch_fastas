@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func makeURLList(data string) []string {
+func makeList(data string) []string {
 	// Consider regex
 	data = strings.ReplaceAll(data, "[", "")
 	data = strings.ReplaceAll(data, "]", "")
@@ -21,42 +21,33 @@ func makeURLList(data string) []string {
 	return arr
 }
 
-func controlFolder(folder string) {
-	_, err := os.Open(folder)
-	if err != nil {
-		if os.IsNotExist(err) {
-			os.Mkdir(folder, 0755)
-		}
-	}
-}
-
-func makeURL(tag string) string {
-	return "https://www.rcsb.org/fasta/entry/" + tag
-}
-
-func extract(url string, channel chan string, finished chan bool) {
+func extract(tag string, channel chan string) {
+	url := "https://www.rcsb.org/fasta/entry/" + tag
 	resp, err := http.Get(url)
 
-	defer func() {
-		finished <- true
-	}()
-
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Cannot recieve", tag, ":", err)
 		return
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
 
-	resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
 
 	// Check for errors in data
 	if err != nil {
-		fmt.Println("File reading error", err)
+		fmt.Println("Cannot read", tag, ":", err)
 		return
 	}
 
 	channel <- string(data)
+}
+
+func write(tag string, folder string, channel chan string) {
+	file, _ := os.Create(folder + tag + ".fasta")
+	_, _ = io.WriteString(file, <-channel)
+
+	defer file.Close()
 }
 
 func main() {
@@ -65,47 +56,43 @@ func main() {
 
 	// Check for request errors
 	if err != nil {
-		print(err)
+		print("Cannot fetch entries:", err)
 		return
 	}
+
+	defer resp.Body.Close()
 
 	// Get requested data
 	data, err := ioutil.ReadAll(resp.Body)
 
 	// Check for errors in data
 	if err != nil {
-		fmt.Println("File reading error", err)
+		fmt.Println("Cannot read entries:", err)
 		return
 	}
 
-	// Close `entry identities`
-	resp.Body.Close()
-
 	// Clean file
-	arr := makeURLList(string(data))
+	arr := makeList(string(data))
 
 	folder := "fasta/"
 
 	// Ensure folder exist
-	controlFolder(folder)
+	_, err = os.Open(folder)
+
+	if err != nil {
+		if os.IsNotExist(err) {
+			os.Mkdir(folder, 0755)
+		}
+	}
 
 	// Channels
 	URLChannel := make(chan string)
-	EOLChannel := make(chan bool)
 
 	// Kick off the extraction process (concurrently)
 	for _, tag := range arr {
-		go extract(makeURL(tag), URLChannel, EOLChannel)
-	}
-
-	for _, tag := range arr {
-		file, _ := os.Create(folder + tag + ".fasta")
-
-		_, _ = io.WriteString(file, <-URLChannel)
-
-		file.Close()
+		go extract(tag, URLChannel)
+		write(tag, folder, URLChannel)
 	}
 
 	close(URLChannel)
-	close(EOLChannel)
 }
