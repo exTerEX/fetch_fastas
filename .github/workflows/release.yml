@@ -5,12 +5,39 @@ on:
     branches:
       - stable
 
+    tags:
+      - v*
+
+  pull_request:
+
 env:
   IMAGE_NAME: fetch
 
 jobs:
-  docker:
-    runs-on: ubuntu-latest
+  release:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          echo "Not implemented yet"
+
+  test:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          echo "Not implemented yet"
+
+  push:
+    needs: test
+    runs-on: ubuntu-20.04
+    if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v2
