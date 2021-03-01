@@ -1,6 +1,9 @@
-.github
+.github/
+fasta/
 .gitignore
 .gitattributes
 Dockerfile
 LICENSE
 README.md
+docker-compose.yml
+.git/
