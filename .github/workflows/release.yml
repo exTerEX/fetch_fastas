@@ -1,39 +1,14 @@
 name: Create release
 
 on:
-  pull_request:
+  push:
     branches:
       - stable
-
-    tags:
-      - v*
-
-    paths-ignore:
-      - "**/*.md"
-      - "**/*.txt"
 
 env:
   IMAGE_NAME: fetch
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: New stable version of fetch_fastas
-          draft: false
-          prerelease: false
-
   docker:
     runs-on: ubuntu-latest
 
@@ -66,4 +41,4 @@ jobs:
           echo VERSION=$VERSION
 
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:latest
+          docker push $IMAGE_ID:$VERSION
