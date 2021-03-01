@@ -1,10 +1,21 @@
 # Fetch fasta RCSB
 
+# Example
+
+```sh
+$ docker pull <TO-BE-DONE>
+```
+
 docker-compose.yml
+
 ```yaml
-to:
-    be:
-        done
+version: "3"
+services:
+  fetchfastas:
+    container_name: fetch
+    image: fetch
+    volumes:
+      - ./fasta:/go/src/app/fasta
 ```
 
 ## License
