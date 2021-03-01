@@ -1,12 +1,14 @@
-# Fetch fasta RCSB
+# Fetch
 
-# Example
+A tool to fetch FASTA-files from RCSBs database. As of now this is a small side project to create a useful tool to fetch a local copy of the RCSB fasta database. It is a simple tool only able to downloading FASTA-files into a folder, but the goal is to make this a more powerful tool to keep a local database of RCSB data synchronized.
+
+## Example
 
 ```sh
-$ docker pull <TO-BE-DONE>
+$ docker pull ghcr.io/exterex/fetch:latest
 ```
 
-docker-compose.yml
+`docker-compose.yml` example:
 
 ```yaml
 version: "3"
