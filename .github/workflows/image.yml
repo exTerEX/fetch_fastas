@@ -64,6 +64,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
 
       - name: Find IMAGE_ID
+        id: id
         run: |
           IMAGE_ID=ghcr.io/${{ github.actor }}/${IMAGE_NAME}
 
@@ -73,6 +74,7 @@ jobs:
           echo IMAGE_ID=${IMAGE_ID}
 
       - name: Find VERSION
+        id: version
         run: |
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e "s,.*/\(.*\),\1,")
@@ -87,7 +89,7 @@ jobs:
 
       - name: test
         run: |
-          echo ${IMAGE_ID}:${VERSION}
+          echo ${{ steps.id.outputs.IMAGE_ID }}:${{ steps.version.outputs.VERSION }}
 
       - name: Build and push
         id: build
@@ -96,6 +98,6 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${IMAGE_ID}:${VERSION}
+          tags: ${{ steps.id.outputs.IMAGE_ID }}:${{ steps.version.outputs.VERSION }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
