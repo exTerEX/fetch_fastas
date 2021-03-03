@@ -71,6 +71,7 @@ jobs:
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr "[A-Z]" "[a-z]")
 
+          echo IMAGE_ID=${IMAGE_ID}
           echo "::set-output name=IMAGE_ID::${IMAGE_ID}"
 
       - name: Find VERSION
@@ -85,6 +86,7 @@ jobs:
           # Use Docker "latest" tag convention
           [ "${VERSION}" == "main" ] && VERSION=latest
 
+          echo VERSION=${VERSION}
           echo "::set-output name=VERSION::${VERSION}"
 
       - name: Build and push
