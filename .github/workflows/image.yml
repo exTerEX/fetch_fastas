@@ -1,4 +1,4 @@
-name: Create release
+name: Build image and push to ghcr.io
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
   push:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == "push"
+    if: github.event_name == 'push'
 
     steps:
       - name: Checkout
