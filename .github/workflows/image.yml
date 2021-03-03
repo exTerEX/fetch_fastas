@@ -3,12 +3,23 @@ name: Create release
 on:
   push:
     branches:
-      - stable
+      - main
 
     tags:
       - v*
 
+    paths-ignore:
+      - "**/*.txt"
+      - "**/*.md"
+      - "**/LICENSE"
+      - "**.git*"
+
   pull_request:
+    paths-ignore:
+      - "**/*.txt"
+      - "**/*.md"
+      - "**/LICENSE"
+      - "**.git*"
 
 env:
   IMAGE_NAME: fetch
