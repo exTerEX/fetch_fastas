@@ -1,13 +1,15 @@
-FROM golang:1.16.0-alpine
+FROM golang:1.16.0-alpine3.13 AS build
 
-ENV GO111MODULE=auto
+WORKDIR /go/src/app/
 
-WORKDIR /go/src/app
+COPY main.go /go/src/app/main.go
 
-COPY . .
+RUN go build -o /bin/app /go/src/app/main.go
 
-RUN go build -o main .
+FROM alpine:3.13
 
-CMD ["/go/src/app/main"]
+COPY --from=build /bin/app /bin/app
 
-VOLUME /go/src/app/fasta
+CMD ["/bin/app"]
+
+VOLUME /bin/fasta
