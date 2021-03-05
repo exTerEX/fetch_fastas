@@ -13,11 +13,11 @@ $ docker pull ghcr.io/exterex/fetch:latest
 ```yaml
 version: "3"
 services:
-  fetchfastas:
+  fetch:
     container_name: fetch
-    image: fetch
+    image: ghrc.io/exterex/fetch
     volumes:
-      - ./fasta:/go/src/app/fasta
+      - ./fasta:/bin/fasta
 ```
 
 ## License
