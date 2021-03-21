@@ -1,15 +1,27 @@
-FROM golang:1.16-alpine AS build
+FROM golang:1.16-alpine AS dev
 
-WORKDIR /go/src/app/
+COPY main.go /go/src
 
-COPY main.go /go/src/app/main.go
+ENV GO111MODULE="on" \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOFLAGS="-mod=vendor"
 
-RUN go build -o /bin/app /go/src/app/main.go
+ENTRYPOINT [ "sh" ]
 
-FROM alpine:3.13
+FROM dev AS build
 
-COPY --from=build /bin/app /bin/app
+RUN (([ ! -d "/go/bin/vendor" ] && go mod download && go mod vendor) || true)
 
-CMD ["/bin/app"]
+RUN go build -ldflags="-s -w" -mod vendor -o /go/bin/fetch /go/src/main.go
 
-VOLUME /bin/fasta
+RUN chmod +x /go/bin/fetch && mkdir /go/bin/fasta
+
+FROM scratch
+
+COPY --from=build /go/bin /
+COPY --from=build etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+CMD [ "/fetch" ]
+
+VOLUME /fasta
