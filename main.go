@@ -1,25 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 )
-
-// TODO: Consider json?
-func makeList(data string) []string {
-	// TODO: Consider regex
-	data = strings.ReplaceAll(data, "[", "")
-	data = strings.ReplaceAll(data, "]", "")
-	data = strings.ReplaceAll(data, "\"", "")
-
-	arr := strings.Split(data, ",")
-
-	return arr
-}
 
 func extract(tag string, channel chan string) {
 	url := "https://www.rcsb.org/fasta/entry/" + tag
@@ -71,8 +59,13 @@ func main() {
 		return
 	}
 
-	// Clean file
-	arr := makeList(string(data))
+	var arr []string
+	err = json.Unmarshal(data, &arr)
+
+	if err != nil {
+		fmt.Println("Cannot convert to json: ", err)
+		return
+	}
 
 	folder := "fasta/"
 
