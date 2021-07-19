@@ -1,4 +1,4 @@
-FROM golang:1.16-alpine AS dev
+FROM golang:1.16.6-alpine AS dev
 
 COPY main.go /go/src
 
